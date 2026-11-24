@@ -1,0 +1,43 @@
+
+import time
+
+# Rate limit settings
+MAX_REQUESTS = 5
+TIME_WINDOW = 60
+
+# Hash Map to store user request details
+users = {}
+
+def rate_limiter(user_id):
+    current_time = time.time()
+
+    # Check if user already exists
+    if user_id not in users:
+        users[user_id] = {
+            "count": 1,
+            "start_time": current_time
+        }
+        return "Request Allowed"
+
+    user = users[user_id]
+
+    # Check if time window has expired
+    if current_time - user["start_time"] >= TIME_WINDOW:
+        user["count"] = 1
+        user["start_time"] = current_time
+        return "Request Allowed"
+
+    # Check request limit
+    if user["count"] < MAX_REQUESTS:
+        user["count"] += 1
+        return "Request Allowed"
+
+    return "Request Rejected: Rate Limit Exceeded"
+
+
+# Testing the rate limiter
+user_id = "User101"
+
+for i in range(7):
+    result = rate_limiter(user_id)
+    print("Request", i + 1, ":", result)
